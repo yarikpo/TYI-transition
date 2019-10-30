@@ -78,12 +78,12 @@ for i in range(0, H):
             leftAns, rightAns, upperAns, bottomAns, col = bfs(i, j, maxSize)
         if col > 9 and abs(leftAns - rightAns) > 2 and abs(upperAns - bottomAns) > 2:
             sample = before[upperAns:bottomAns, leftAns:rightAns]
-            if i > 2:
-                cv2.imwrite(f'{i}.png', sample)
+            # if i > 2:
+            #     cv2.imwrite(f'{i}.png', sample)
 
-            before = cv2.rectangle(before, (leftAns, upperAns), (rightAns, bottomAns), (255, 0, 0), 1)
+            after = cv2.rectangle(after, (leftAns, upperAns), (rightAns, bottomAns), (255, 0, 0), 1)
 
-            img_grey = cv2.cvtColor(before, cv2.COLOR_BGR2GRAY)
+            img_grey = cv2.cvtColor(after, cv2.COLOR_BGR2GRAY)
             template = cv2.cvtColor(sample, cv2.COLOR_BGR2GRAY)
 
             w, h = template.shape[::-1]
@@ -92,11 +92,11 @@ for i in range(0, H):
             loc = np.where(res >= threshold)
 
             for pt in zip(*loc[::-1]):
-                cv2.rectangle(before, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 1)
+                cv2.rectangle(after, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 1)
 
 
 
-cv2.imwrite('rectangle.png', before)
+cv2.imwrite('rectangle.png', after)
 
 
 cv2.waitKey(0)
