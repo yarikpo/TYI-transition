@@ -64,8 +64,8 @@ def bfs(y, x, maxSize):
         q.pop(0)
     print('End of loop')
     if col > maxSize:
-        return (-1, -1, -1, -1)
-    return (leftAns, rightAns, upperAns, bottomAns)
+        return (-1, -1, -1, -1, -1)
+    return (leftAns, rightAns, upperAns, bottomAns, col)
 
 print(f'{H} x {W}')
 for i in range(0, H):
@@ -73,12 +73,27 @@ for i in range(0, H):
         for g in range(1, 11):
             if i == H // 100 * g * 10 and j == 0:
                 print(g * 10, f'%')
-        leftAns, rightAns, upperAns, bottomAns = (-1, -1, -1, -1)
+        leftAns, rightAns, upperAns, bottomAns, col = (-1, -1, -1, -1, -1)
         if used[i][j] == False:
-            leftAns, rightAns, upperAns, bottomAns = bfs(i, j, maxSize)
-        if leftAns != -1:
+            leftAns, rightAns, upperAns, bottomAns, col = bfs(i, j, maxSize)
+        if col > 9 and abs(leftAns - rightAns) > 2 and abs(upperAns - bottomAns) > 2:
             sample = before[upperAns:bottomAns, leftAns:rightAns]
+            if i > 2:
+                cv2.imwrite(f'{i}.png', sample)
+
             before = cv2.rectangle(before, (leftAns, upperAns), (rightAns, bottomAns), (255, 0, 0), 1)
+
+            img_grey = cv2.cvtColor(before, cv2.COLOR_BGR2GRAY)
+            template = cv2.cvtColor(sample, cv2.COLOR_BGR2GRAY)
+
+            w, h = template.shape[::-1]
+            res = cv2.matchTemplate(img_grey, template, cv2.TM_CCOEFF_NORMED)
+            threshold = 0.99
+            loc = np.where(res >= threshold)
+
+            for pt in zip(*loc[::-1]):
+                cv2.rectangle(before, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 1)
+
 
 
 cv2.imwrite('rectangle.png', before)
